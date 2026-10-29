@@ -1,0 +1,37 @@
+productId;name;price;quantity;expected
+# Формат: <productId>;<name>;<price>;<quantity>;<expected>
+# expected: OK:qty=N | OK:merged,qty=N | SKIP:<причина> | ERROR:<причина>
+# Служебные строки: TOTAL;positions=N;sum=S — итог текущего заказа
+# Вариант 26: CONFIRM — подтвердить текущий заказ; NEW_ORDER;<id>;<ФИО> — OrderService.createOrder
+#             (заказ сохраняется в репозитории и становится текущим); REPO — addRepositoryCount
+# === Корректные продукты ===
+M01;Monitor 27;32990;2;OK:qty=2
+K01;Keyboard;4490;3;OK:qty=3
+M02;Monitor 32;45000;1;OK:qty=1
+P01;Printer;15000;1;OK:qty=1
+# === Объединение повторов (R7): M01 уже есть ===
+M01;Monitor 27;32990;1;OK:merged,qty=3
+# === Ошибки Product (R1, R3) ===
+X01;Broken;-100;1;SKIP:price must be > 0
+X02;Free;0;1;SKIP:price must be > 0
+;No id;100;1;SKIP:id is null or blank
+# === Границы quantity (R4) ===
+L01;Lamp;1000;1;OK:qty=1
+L02;Lamp Pro;2000;100;OK:qty=100
+L03;Lamp Max;3000;101;SKIP:quantity must be in
+L04;Lamp Zero;3000;0;SKIP:quantity must be in
+# === Объединение сверх максимума: L02 остаётся с прежним qty ===
+L02;Lamp Pro;2000;1;SKIP:quantity must be in
+# === Дополнительные продукты ===
+C01;Cable;500;5;OK:qty=5
+# === Итог первого заказа: 7 позиций, X01 X02 без id L03 L04 пропущены ===
+TOTAL;positions=7;sum=375940.00
+# === Вариант 26: репозиторий заказов ===
+REPO;;;;OK:count=1
+CONFIRM;;;;OK:CONFIRMED
+K01;Keyboard;4490;1;ERROR:order is confirmed
+NEW_ORDER;E02;Петров Пётр;;OK:count=2
+CONFIRM;;;;ERROR:order is empty
+C02;Cable Pro;1500;2;OK:qty=2
+TOTAL;positions=1;sum=3000.00
+REPO;;;;OK:count=2

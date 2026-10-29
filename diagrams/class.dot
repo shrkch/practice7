@@ -1,0 +1,30 @@
+digraph C {
+graph [rankdir=TB, bgcolor="white", pad=0.3, nodesep=0.5, ranksep=0.55, dpi=200];
+node [shape=record, style="filled", fontname="Times New Roman", fontsize=10, color="#2F5597", fillcolor="#F7FBFF"];
+edge [fontname="Times New Roman", fontsize=9, color="#555555"];
+
+sc [label="{SelfCheck||+ main(String[]) void\l}"];
+
+s [label="{OrderService|- repository OrderRepository\l|+ OrderService(OrderRepository)\l+ createOrder(Employee) Order\l+ addRepositoryCount(OrderRepository) int\l}"];
+
+r [label="{OrderRepository|- orders List[Order]\l|+ save(Order) void\l+ findAll() List[Order]\l}"];
+
+o [label="{Order|- employee Employee\l- items List[OrderItem]\l- status OrderStatus\l|+ Order(Employee)\l+ addProduct(Product, int) void\l+ removeProduct(String) void\l+ total() double\l+ confirm() void\l+ getItems() List[OrderItem]\l+ getStatus() OrderStatus\l+ getEmployee() Employee\l- checkDraft() void\l}"];
+
+st [label="{«enumeration»\nOrderStatus|DRAFT\lCONFIRMED\l}"];
+
+e [label="{«record»\nEmployee|- id String\l- fullName String\l|+ id() String\l+ fullName() String\l}"];
+
+oi [label="{OrderItem|+ MIN_QUANTITY: int = 1\l+ MAX_QUANTITY: int = 100\l- product Product\l- quantity int\l|+ OrderItem(Product, int)\l- setQuantity(int) void\l+ increase(int) void\l+ getLineTotal() double\l+ getProduct() Product\l+ getQuantity() int\l}"];
+
+p [label="{Product|- id String\l- name String\l- price double\l|+ Product(String, String, double)\l+ getId() String\l+ getName() String\l+ getPrice() double\l}"];
+
+sc -> s [label="uses", style=dashed, arrowhead=open];
+s -> r [label="1", arrowtail=odiamond, dir=both];
+s -> o [label="creates", style=dashed, arrowhead=open];
+r -> o [label="0..*", arrowtail=odiamond, dir=both];
+o -> e [label="1", arrowtail=odiamond, dir=both];
+o -> st [label="1", arrowhead=open];
+o -> oi [label="0..*", arrowtail=diamond, dir=both];
+oi -> p [label="1", arrowtail=odiamond, dir=both];
+}
